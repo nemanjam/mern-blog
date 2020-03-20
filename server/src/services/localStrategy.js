@@ -1,14 +1,15 @@
-const passport = require("passport");
-const User = require("../models/User");
-const PassportLocalStrategy = require("passport-local").Strategy;
-const Joi = require("joi");
+import passport from 'passport';
+import { Strategy as PassportLocalStrategy } from 'passport-local';
+import Joi from 'joi';
+
+import User from '../models/User';
 
 const passportLogin = new PassportLocalStrategy(
   {
-    usernameField: "email",
-    passwordField: "password",
+    usernameField: 'email',
+    passwordField: 'password',
     session: false,
-    passReqToCallback: true
+    passReqToCallback: true,
   },
   async (req, email, password, done) => {
     const schema = Joi.object().keys({
@@ -20,7 +21,7 @@ const passportLogin = new PassportLocalStrategy(
         .trim()
         .min(6)
         .max(12)
-        .required()
+        .required(),
     });
 
     try {
@@ -31,7 +32,7 @@ const passportLogin = new PassportLocalStrategy(
     try {
       const user = await User.findOne({ email: email.trim() });
       if (!user) {
-        return done(null, false, { message: "Email does not exists." });
+        return done(null, false, { message: 'Email does not exists.' });
       }
 
       user.comparePassword(password, function(err, isMatch) {
@@ -39,7 +40,7 @@ const passportLogin = new PassportLocalStrategy(
           return done(err);
         }
         if (!isMatch) {
-          return done(null, false, { message: "Incorrect password." });
+          return done(null, false, { message: 'Incorrect password.' });
         }
 
         return done(null, user);
@@ -47,7 +48,7 @@ const passportLogin = new PassportLocalStrategy(
     } catch (err) {
       return done(err);
     }
-  }
+  },
 );
 
 passport.use(passportLogin);

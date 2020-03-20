@@ -1,22 +1,23 @@
-const express = require('express');
-const router = express.Router();
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
-const Joi = require('joi');
+import { Router } from 'express';
+import passport from 'passport';
+import jwt from 'jsonwebtoken';
+import Joi from 'joi';
 
-const keys = require('../config/keys');
-const User = require('../models/User');
-const requireLocalAuth = require('../middleware/requireLocalAuth');
+import User from '../models/User';
+import requireLocalAuth from '../middleware/requireLocalAuth';
+
+const router = Router();
 
 const tokenFromUser = user => {
-  const token = jwt.sign({}, keys.secretOrKey, {
+  const token = jwt.sign({}, process.env.JWT_SECRET_DEV, {
     expiresIn: '12h',
     subject: user.id,
   });
   return token;
 };
 
-// facebook auth
+// =============== facebook auth ===================
+
 router.get(
   '/auth/facebook',
   passport.authenticate('facebook', {
@@ -25,7 +26,7 @@ router.get(
 );
 
 router.get(
-  keys.facebookCallbackURL,
+  process.env.FACEBOOK_CALLBACK_URL,
   passport.authenticate('facebook', {
     failureRedirect: '/',
     session: false,
@@ -33,11 +34,14 @@ router.get(
   (req, res) => {
     const token = tokenFromUser(req.user);
     res.cookie('x-auth-cookie', token);
-    res.redirect(keys.successRedirectURL);
+    res.redirect(process.env.SUCCESS_REDIRECT_URL_DEV);
   },
 );
 
-// google auth
+// /=============== facebook auth ===================
+
+// ================== google auth ===================
+
 router.get(
   '/auth/google',
   passport.authenticate('google', {
@@ -46,7 +50,7 @@ router.get(
 );
 
 router.get(
-  keys.googleCallbackURL,
+  process.env.GOOGLE_CALLBACK_URL,
   passport.authenticate('google', {
     failureRedirect: '/',
     session: false,
@@ -54,11 +58,14 @@ router.get(
   (req, res) => {
     const token = tokenFromUser(req.user);
     res.cookie('x-auth-cookie', token);
-    res.redirect(keys.successRedirectURL);
+    res.redirect(process.env.SUCCESS_REDIRECT_URL_DEV);
   },
 );
 
-//local login
+// /================== google auth ===================
+
+// ==================== local auth ===================
+
 router.post('/auth/login', requireLocalAuth, (req, res) => {
   const token = tokenFromUser(req.user);
   res.cookie('x-auth-cookie', token);
@@ -124,6 +131,8 @@ router.post('/auth/register', async (req, res, next) => {
     return next(err);
   }
 });
+
+// /==================== local auth ===================
 
 // logout
 router.get('/auth/logout', (req, res) => {

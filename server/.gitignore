@@ -6,3 +6,4 @@ package-lock.json
 /security/cert.pem
 
 /.vscode
+.env

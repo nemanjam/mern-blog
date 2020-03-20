@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import https from 'https';
@@ -5,11 +6,10 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import passport from 'passport';
 
-const app = express();
+import authRoutes from './routes/auth';
+import apiRoutes from './routes/api';
 
-const keys = require('./config/keys');
-const authRoutes = require('./routes/auth');
-const apiRoutes = require('./routes/api');
+const app = express();
 
 // Bodyparser Middleware
 app.use(express.json());
@@ -21,15 +21,17 @@ require('./services/facebookStrategy');
 require('./services/googleStrategy');
 require('./services/localStrategy');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 // DB Config
-const dbConnection = keys.mongoURI;
+const dbConnection = isProduction ? process.env.MONGO_URI_PROD : process.env.MONGO_URI_DEV;
 
 // Connect to Mongo
 mongoose
   .connect(dbConnection, {
-    useNewUrlParser: true,
+    useNewUrlParser: true, // Adding new mongo url parser
     useCreateIndex: true,
-  }) // Adding new mongo url parser
+  })
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
 

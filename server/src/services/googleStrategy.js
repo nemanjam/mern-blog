@@ -1,16 +1,15 @@
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth2").Strategy;
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 
-const keys = require("../config/keys");
-const User = require("../models/User");
+import User from '../models/User';
 
 // google strategy
 const googleLogin = new GoogleStrategy(
   {
-    clientID: keys.googleClientID,
-    clientSecret: keys.googleClientSecret,
-    callbackURL: keys.googleCallbackURL,
-    proxy: true
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    proxy: true,
   },
   async (accessToken, refreshToken, profile, done) => {
     // console.log(profile);
@@ -26,17 +25,17 @@ const googleLogin = new GoogleStrategy(
 
     try {
       const newUser = await new User({
-        provider: "google",
+        provider: 'google',
         googleId: profile.id,
         googleEmail: profile.email,
         googleDisplayName: profile.displayName,
-        googlePicture: profile.picture
+        googlePicture: profile.picture,
       }).save();
       done(null, newUser);
     } catch (err) {
       console.log(err);
     }
-  }
+  },
 );
 
 passport.use(googleLogin);

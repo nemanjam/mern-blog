@@ -1,27 +1,26 @@
-const passport = require("passport");
-const FacebookStrategy = require("passport-facebook").Strategy;
+import passport from 'passport';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
 
-const keys = require("../config/keys");
-const User = require("../models/User");
+import User from '../models/User';
 
 // facebook strategy
 const facebookLogin = new FacebookStrategy(
   {
-    clientID: keys.facebookAppID,
-    clientSecret: keys.facebookSecret,
-    callbackURL: keys.facebookCallbackURL,
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_SECRET,
+    callbackURL: process.env.FACEBOOK_CALLBACK_URL,
     profileFields: [
-      "id",
-      "email",
-      "gender",
-      "profileUrl",
-      "displayName",
-      "locale",
-      "name",
-      "timezone",
-      "updated_time",
-      "verified"
-    ]
+      'id',
+      'email',
+      'gender',
+      'profileUrl',
+      'displayName',
+      'locale',
+      'name',
+      'timezone',
+      'updated_time',
+      'verified',
+    ],
   },
   async (accessToken, refreshToken, profile, done) => {
     //console.log(profile);
@@ -38,18 +37,18 @@ const facebookLogin = new FacebookStrategy(
     // register user
     try {
       const newUser = await new User({
-        provider: "facebook",
+        provider: 'facebook',
         facebookId: profile.id,
         facebookEmail: profile.emails[0].value,
         facebookDisplayName: profile.displayName,
-        facebookProfileUrl: profile.profileUrl
+        facebookProfileUrl: profile.profileUrl,
       }).save();
 
       done(null, newUser);
     } catch (err) {
       console.log(err);
     }
-  }
+  },
 );
 
 passport.use(facebookLogin);
