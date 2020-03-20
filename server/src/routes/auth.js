@@ -140,4 +140,4 @@ router.get('/auth/logout', (req, res) => {
   res.send(false);
 });
 
-module.exports = router;
+export default router;

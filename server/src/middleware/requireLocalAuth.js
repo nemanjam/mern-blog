@@ -1,12 +1,12 @@
-const passport = require("passport");
+import passport from 'passport';
 
-const requireLocalAuth1 = passport.authenticate("local", {
+const requireLocalAuth1 = passport.authenticate('local', {
   session: false,
-  failureFlash: true
+  failureFlash: true,
 });
 
 const requireLocalAuth = function(req, res, next) {
-  passport.authenticate("local", function(err, user, info) {
+  passport.authenticate('local', function(err, user, info) {
     if (err) {
       return next(err);
     }
@@ -18,4 +18,4 @@ const requireLocalAuth = function(req, res, next) {
   })(req, res, next);
 };
 
-module.exports = requireLocalAuth;
+export default requireLocalAuth;
