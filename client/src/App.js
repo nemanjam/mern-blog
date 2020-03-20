@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
 
-import "./App.css";
 import Login from "./views/Login";
 import Register from "./views/Register";
 import Home from "./views/Home";
