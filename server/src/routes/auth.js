@@ -1,71 +1,71 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
-const Joi = require("joi");
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+const Joi = require('joi');
 
-const keys = require("../config/keys");
-const User = require("../models/User");
-const requireLocalAuth = require("../middleware/requireLocalAuth");
+const keys = require('../config/keys');
+const User = require('../models/User');
+const requireLocalAuth = require('../middleware/requireLocalAuth');
 
-tokenFromUser = user => {
+const tokenFromUser = user => {
   const token = jwt.sign({}, keys.secretOrKey, {
-    expiresIn: "12h",
-    subject: user.id
+    expiresIn: '12h',
+    subject: user.id,
   });
   return token;
 };
 
 // facebook auth
 router.get(
-  "/auth/facebook",
-  passport.authenticate("facebook", {
-    scope: ["public_profile", "email"]
-  })
+  '/auth/facebook',
+  passport.authenticate('facebook', {
+    scope: ['public_profile', 'email'],
+  }),
 );
 
 router.get(
   keys.facebookCallbackURL,
-  passport.authenticate("facebook", {
-    failureRedirect: "/",
-    session: false
+  passport.authenticate('facebook', {
+    failureRedirect: '/',
+    session: false,
   }),
   (req, res) => {
     const token = tokenFromUser(req.user);
-    res.cookie("x-auth-cookie", token);
+    res.cookie('x-auth-cookie', token);
     res.redirect(keys.successRedirectURL);
-  }
+  },
 );
 
 // google auth
 router.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"]
-  })
+  '/auth/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+  }),
 );
 
 router.get(
   keys.googleCallbackURL,
-  passport.authenticate("google", {
-    failureRedirect: "/",
-    session: false
+  passport.authenticate('google', {
+    failureRedirect: '/',
+    session: false,
   }),
   (req, res) => {
     const token = tokenFromUser(req.user);
-    res.cookie("x-auth-cookie", token);
+    res.cookie('x-auth-cookie', token);
     res.redirect(keys.successRedirectURL);
-  }
+  },
 );
 
 //local login
-router.post("/auth/login", requireLocalAuth, (req, res) => {
+router.post('/auth/login', requireLocalAuth, (req, res) => {
   const token = tokenFromUser(req.user);
-  res.cookie("x-auth-cookie", token);
+  res.cookie('x-auth-cookie', token);
   res.json({ token });
 });
 
-router.post("/auth/register", async (req, res, next) => {
+router.post('/auth/register', async (req, res, next) => {
   const schema = Joi.object().keys({
     firstName: Joi.string()
       .trim()
@@ -86,7 +86,7 @@ router.post("/auth/register", async (req, res, next) => {
       .min(6)
       .max(12)
       .required(),
-    policy: Joi.boolean().required()
+    policy: Joi.boolean().required(),
   });
 
   let form;
@@ -101,16 +101,16 @@ router.post("/auth/register", async (req, res, next) => {
     const existingUser = await User.findOne({ email: email });
 
     if (existingUser) {
-      return res.status(422).send({ error: "Email is in use" });
+      return res.status(422).send({ error: 'Email is in use' });
     }
 
     try {
       const newUser = await new User({
-        provider: "email",
+        provider: 'email',
         email,
         password,
         firstName,
-        lastName
+        lastName,
       });
 
       newUser.registerUser(newUser, (err, user) => {
@@ -126,7 +126,7 @@ router.post("/auth/register", async (req, res, next) => {
 });
 
 // logout
-router.get("/auth/logout", (req, res) => {
+router.get('/auth/logout', (req, res) => {
   req.logout();
   res.send(false);
 });
