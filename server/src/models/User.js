@@ -10,8 +10,7 @@ const userSchema = new Schema({
   },
 
   // local
-  firstName: String,
-  lastName: String,
+  localDisplayName: String,
   email: {
     type: String,
     unique: true,

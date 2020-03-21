@@ -1,22 +1,38 @@
-import { LOGIN_USER, LOGOUT_USER, REGISTER_USER_WITH_EMAIL, LOGIN_USER_WITH_EMAIL } from '../types';
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  LOGOUT_SUCCESS,
+  REGISTER_USER_WITH_EMAIL_SUCCESS,
+  REGISTER_USER_WITH_EMAIL_FAIL,
+  LOGIN_USER_WITH_EMAIL_SUCCESS,
+  LOGIN_USER_WITH_EMAIL_FAIL,
+} from '../types';
 
 const initialState = {
+  token: localStorage.getItem('token'),
   isAuthenticated: false,
-  user: {},
+  isLoading: false,
+  user: null,
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case LOGIN_USER:
+    case REGISTER_USER_WITH_EMAIL_SUCCESS:
+    case LOGIN_USER_WITH_EMAIL_SUCCESS:
+      localStorage.setItem('token', action.payload.token);
+      return {
+        ...state,
+        isAuthenticated: true,
+        isLoading: false,
+        token: action.payload.token,
+      };
+    case LOGIN_SUCCESS:
       return {
         ...state,
         isAuthenticated: true,
         user: action.payload,
       };
-    case REGISTER_USER_WITH_EMAIL:
-    case LOGIN_USER_WITH_EMAIL:
-      return state;
-    case LOGOUT_USER:
+    case LOGOUT_SUCCESS:
       return {
         ...state,
         isAuthenticated: false,

@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 
@@ -16,56 +15,6 @@ const tokenFromUser = user => {
   return token;
 };
 
-// =============== facebook auth ===================
-
-router.get(
-  '/auth/facebook',
-  passport.authenticate('facebook', {
-    scope: ['public_profile', 'email'],
-  }),
-);
-
-router.get(
-  process.env.FACEBOOK_CALLBACK_URL,
-  passport.authenticate('facebook', {
-    failureRedirect: '/',
-    session: false,
-  }),
-  (req, res) => {
-    const token = tokenFromUser(req.user);
-    res.cookie('x-auth-cookie', token);
-    res.redirect(process.env.SUCCESS_REDIRECT_URL_DEV);
-  },
-);
-
-// /=============== facebook auth ===================
-
-// ================== google auth ===================
-
-router.get(
-  '/auth/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email'],
-  }),
-);
-
-router.get(
-  process.env.GOOGLE_CALLBACK_URL,
-  passport.authenticate('google', {
-    failureRedirect: '/',
-    session: false,
-  }),
-  (req, res) => {
-    const token = tokenFromUser(req.user);
-    res.cookie('x-auth-cookie', token);
-    res.redirect(process.env.SUCCESS_REDIRECT_URL_DEV);
-  },
-);
-
-// /================== google auth ===================
-
-// ==================== local auth ===================
-
 router.post('/auth/login', requireLocalAuth, (req, res) => {
   const token = tokenFromUser(req.user);
   res.cookie('x-auth-cookie', token);
@@ -74,15 +23,10 @@ router.post('/auth/login', requireLocalAuth, (req, res) => {
 
 router.post('/auth/register', async (req, res, next) => {
   const schema = Joi.object().keys({
-    firstName: Joi.string()
+    fullName: Joi.string()
       .trim()
       .min(2)
-      .max(12)
-      .required(),
-    lastName: Joi.string()
-      .trim()
-      .min(2)
-      .max(12)
+      .max(24)
       .required(),
     email: Joi.string()
       .trim()
@@ -102,7 +46,7 @@ router.post('/auth/register', async (req, res, next) => {
   } catch (err) {
     return res.status(422).send(err.details[0].message);
   }
-  const { email, password, firstName, lastName } = form;
+  const { email, password, fullName } = form;
 
   try {
     const existingUser = await User.findOne({ email: email });
@@ -116,13 +60,22 @@ router.post('/auth/register', async (req, res, next) => {
         provider: 'email',
         email,
         password,
-        firstName,
-        lastName,
+        localDisplayName: fullName,
       });
 
       newUser.registerUser(newUser, (err, user) => {
         if (err) throw err;
-        res.send({ registerSuccess: true });
+        const token = tokenFromUser(user);
+        res.cookie('x-auth-cookie', token);
+        res.json({
+          token,
+          user: {
+            id: user.id,
+            displayName: user.localDisplayName,
+            email: user.email,
+            provider: user.provider,
+          },
+        });
       });
     } catch (err) {
       return next(err);
@@ -131,8 +84,6 @@ router.post('/auth/register', async (req, res, next) => {
     return next(err);
   }
 });
-
-// /==================== local auth ===================
 
 // logout
 router.get('/auth/logout', (req, res) => {

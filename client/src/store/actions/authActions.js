@@ -3,24 +3,32 @@ import Cookies from 'js-cookie';
 
 import {
   SET_ERROR,
-  LOGIN_USER,
-  LOGOUT_USER,
-  REGISTER_USER_WITH_EMAIL,
-  LOGIN_USER_WITH_EMAIL,
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  LOGOUT_SUCCESS,
+  REGISTER_USER_WITH_EMAIL_SUCCESS,
+  REGISTER_USER_WITH_EMAIL_FAIL,
+  LOGIN_USER_WITH_EMAIL_SUCCESS,
+  LOGIN_USER_WITH_EMAIL_FAIL,
 } from '../types';
 
 export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, getState) => {
   try {
     const response = await axios.post('/auth/register', formData);
+    console.log('formData', formData, 'response', response);
 
     dispatch({
-      type: REGISTER_USER_WITH_EMAIL,
+      type: REGISTER_USER_WITH_EMAIL_SUCCESS,
+      payload: response.data,
     });
     cb();
   } catch (err) {
     dispatch({
       type: SET_ERROR,
       payload: err.response.data,
+    });
+    dispatch({
+      type: REGISTER_USER_WITH_EMAIL_FAIL,
     });
     cbErr();
   }
@@ -30,7 +38,7 @@ export const loginUserWithEmail = (formData, cb, cbErr) => async (dispatch, getS
   try {
     const response = await axios.post('/auth/login', formData);
     dispatch({
-      type: LOGIN_USER_WITH_EMAIL,
+      type: LOGIN_USER_WITH_EMAIL_SUCCESS,
     });
     cb();
   } catch (err) {
@@ -58,7 +66,7 @@ export const logInUser = () => async (dispatch, getState) => {
       Cookies.remove('x-auth-cookie'); //delete just that cookie
 
       dispatch({
-        type: LOGIN_USER,
+        type: LOGIN_SUCCESS,
         payload: response.data.user,
       });
       return;
@@ -73,7 +81,7 @@ export const logInUser = () => async (dispatch, getState) => {
 
       const response = await axios.get('/api/user', { headers });
       dispatch({
-        type: LOGIN_USER,
+        type: LOGIN_SUCCESS,
         payload: response.data.user,
       });
       return;
@@ -96,7 +104,7 @@ export const logOutUser = cb => async dispatch => {
     await axios.get('/auth/logout');
 
     dispatch({
-      type: LOGOUT_USER,
+      type: LOGOUT_SUCCESS,
       payload: false,
     });
     cb();

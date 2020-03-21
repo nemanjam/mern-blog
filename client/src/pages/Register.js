@@ -212,17 +212,9 @@ class Register extends Component {
                     <Field
                       className={classes.textField}
                       variant="outlined"
-                      name="firstName"
+                      name="fullName"
                       component={renderTextField}
-                      label="First Name"
-                      errorclass={classes.fieldError}
-                    />
-                    <Field
-                      className={classes.textField}
-                      variant="outlined"
-                      name="lastName"
-                      component={renderTextField}
-                      label="Last Name"
+                      label="Full Name"
                       errorclass={classes.fieldError}
                     />
                     <Field
@@ -315,7 +307,7 @@ const mapStateToProps = state => ({
 
 const validate = values => {
   const errors = {};
-  const requiredFields = ['firstName', 'lastName', 'email', 'password'];
+  const requiredFields = ['fullName', 'email', 'password'];
   requiredFields.forEach(field => {
     if (!values[field]) {
       errors[field] = 'Field is required';
