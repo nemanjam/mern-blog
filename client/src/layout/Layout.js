@@ -1,40 +1,35 @@
-import React, { Component, Fragment } from "react";
-import Navbar from "./components/Navbar";
+import React, { Fragment } from 'react';
+import Navbar from './components/Navbar';
 
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
-    width: "auto",
+    width: 'auto',
     marginLeft: theme.spacing(3),
     marginRight: theme.spacing(3),
     [theme.breakpoints.up(1140 + theme.spacing(3 * 2))]: {
       width: 1140,
-      marginLeft: "auto",
-      marginRight: "auto"
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
-    paddingTop: "64px"
+    paddingTop: '64px',
   },
-  paper: {
-    ...theme.mixins.gutters(),
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2)
-  }
-});
+}));
 
-const Layout = props => {
-  const { classes } = props;
+const Layout = ({ children }) => {
+  const classes = useStyles();
   return (
     <Fragment>
       <Navbar />
-      <div className={classes.root}>{props.children}</div>
+      <div className={classes.root}>{children}</div>
     </Fragment>
   );
 };
 
 Layout.propTypes = {
-  classes: PropTypes.object.isRequired
+  children: PropTypes.node.isRequired,
 };
 
-export default withStyles(styles)(Layout);
+export default Layout;

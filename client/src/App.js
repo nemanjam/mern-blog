@@ -24,22 +24,20 @@ const store = createStore(
   ),
 );
 
-class App extends Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <Router>
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route path="/login" component={Login} />
-            <Route path="/register" component={Register} />
-            <Route path="/profile" component={Profile} />
-            <Route path="/feature" component={Feature} />
-          </Switch>
-        </Router>
-      </Provider>
-    );
-  }
-}
+const App = () => {
+  return (
+    <Provider store={store}>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <Route path="/profile" component={Profile} />
+          <Route path="/feature" component={Feature} />
+        </Switch>
+      </Router>
+    </Provider>
+  );
+};
 
 export default App;

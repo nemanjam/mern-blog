@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
-
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+
+import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import ExitToApp from '@material-ui/icons/ExitToApp';
@@ -18,17 +17,9 @@ import Menu from '@material-ui/core/Menu';
 
 import { logInUser, logOutUser } from '../../store/actions/authActions';
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
-  },
-  grow: {
-    flexGrow: 1,
-    marginLeft: 20,
-  },
-  menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
   },
   noWrap: {
     whiteSpace: 'nowrap',
@@ -36,114 +27,100 @@ const styles = theme => ({
   toolbarButtons: {
     marginLeft: 'auto',
   },
-  rightIcon: {
-    marginLeft: theme.spacing(1),
-    //border: '1px solid white',
-    width: '20px',
-    height: '20px',
-    //borderRadius: 4,
-    //background: 'white'
-  },
-});
+}));
 
-class Navbar extends Component {
-  state = {
-    anchorEl: null,
+const Navbar = ({ auth, logOutUser, logInUser, history }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  useEffect(() => {
+    if (window.location.hash === '#_=_') window.location.hash = '';
+    logInUser();
+  }, []);
+
+  const handleMenu = event => {
+    setAnchorEl(event.currentTarget);
   };
 
-  handleMenu = event => {
-    this.setState({ anchorEl: event.currentTarget });
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
-  handleClose = () => {
-    this.setState({ anchorEl: null });
-  };
-
-  onLogOut = () => {
-    this.props.logOutUser(() => {
-      this.props.history.push('/');
+  const onLogOut = () => {
+    logOutUser(() => {
+      history.push('/');
     });
   };
 
-  componentDidMount() {
-    if (window.location.hash === '#_=_') window.location.hash = '';
-    this.props.logInUser();
-    // console.log('store: ', this.props.auth);
-  }
+  const classes = useStyles();
 
-  render() {
-    const { classes, auth } = this.props;
-    const { anchorEl } = this.state;
-
-    return (
-      <div className={classes.root}>
-        <AppBar>
-          <Toolbar>
-            <Typography variant="h6" noWrap color="inherit" style={{ marginRight: '20px' }}>
-              Mern
-            </Typography>
-            <Button color="inherit" component={Link} to="/">
-              Home
+  return (
+    <div className={classes.root}>
+      <AppBar>
+        <Toolbar>
+          <Typography variant="h6" noWrap color="inherit" style={{ marginRight: '20px' }}>
+            Mern
+          </Typography>
+          <Button color="inherit" component={Link} to="/">
+            Home
+          </Button>
+          {auth.isAuthenticated && (
+            <Button color="inherit" component={Link} to="/feature">
+              Feature
             </Button>
-            {auth.isAuthenticated && (
-              <Button color="inherit" component={Link} to="/feature">
-                Feature
+          )}
+          <section className={classes.toolbarButtons}>
+            {auth.isAuthenticated ? (
+              <div>
+                <IconButton
+                  aria-owns={Boolean(anchorEl) ? 'menu-appbar' : undefined}
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem component={Link} to="/profile">
+                    <IconButton color="inherit">
+                      <AccountCircle />
+                    </IconButton>
+                    <p>Profile</p>
+                  </MenuItem>
+                  <MenuItem onClick={onLogOut}>
+                    <IconButton color="inherit">
+                      <ExitToApp />
+                    </IconButton>
+                    <p>Log out</p>
+                  </MenuItem>
+                </Menu>
+              </div>
+            ) : (
+              <Button className={classes.noWrap} color="inherit" component={Link} to="/login">
+                Login
               </Button>
             )}
-            <section className={classes.toolbarButtons}>
-              {auth.isAuthenticated ? (
-                <div>
-                  <IconButton
-                    aria-owns={Boolean(anchorEl) ? 'menu-appbar' : undefined}
-                    aria-haspopup="true"
-                    onClick={this.handleMenu}
-                    color="inherit"
-                  >
-                    <AccountCircle />
-                  </IconButton>
-                  <Menu
-                    id="menu-appbar"
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    open={Boolean(anchorEl)}
-                    onClose={this.handleClose}
-                  >
-                    <MenuItem component={Link} to="/profile">
-                      <IconButton color="inherit">
-                        <AccountCircle />
-                      </IconButton>
-                      <p>Profile</p>
-                    </MenuItem>
-                    <MenuItem onClick={this.onLogOut}>
-                      <IconButton color="inherit">
-                        <ExitToApp />
-                      </IconButton>
-                      <p>Log out</p>
-                    </MenuItem>
-                  </Menu>
-                </div>
-              ) : (
-                <Button className={classes.noWrap} color="inherit" component={Link} to="/login">
-                  Login
-                </Button>
-              )}
-            </section>
-          </Toolbar>
-        </AppBar>
-      </div>
-    );
-  }
-}
+          </section>
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
+};
 
 Navbar.propTypes = {
-  classes: PropTypes.object.isRequired,
+  // classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -151,8 +128,4 @@ const mapStateToProps = state => ({
   errors: state.errors,
 });
 
-export default compose(
-  withRouter,
-  connect(mapStateToProps, { logInUser, logOutUser }),
-  withStyles(styles),
-)(Navbar);
+export default compose(withRouter, connect(mapStateToProps, { logInUser, logOutUser }))(Navbar);
