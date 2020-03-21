@@ -31,6 +31,7 @@ mongoose
   .connect(dbConnection, {
     useNewUrlParser: true, // Adding new mongo url parser
     useCreateIndex: true,
+    useUnifiedTopology: true,
   })
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
@@ -41,7 +42,7 @@ app.use('/', apiRoutes);
 app.use('/static', express.static(__dirname + '/static'));
 
 // Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
+if (isProduction) {
   // Set static folder
   app.use(express.static('client/build'));
 

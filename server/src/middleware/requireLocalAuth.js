@@ -1,12 +1,7 @@
 import passport from 'passport';
 
-const requireLocalAuth1 = passport.authenticate('local', {
-  session: false,
-  failureFlash: true,
-});
-
-const requireLocalAuth = function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
+const requireLocalAuth = (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
     if (err) {
       return next(err);
     }

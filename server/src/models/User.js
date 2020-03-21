@@ -1,11 +1,12 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+
 const { Schema } = mongoose;
-const bcrypt = require("bcryptjs");
 
 const userSchema = new Schema({
   provider: {
     type: String,
-    required: true
+    required: true,
   },
 
   // local
@@ -15,18 +16,20 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     sparse: true,
-    trim: true
+    trim: true,
   },
   password: {
     type: String,
-    trim: true
+    trim: true,
+    minlength: 6,
+    maxlength: 60,
   },
 
   // google
   googleId: {
     type: String,
     unique: true,
-    sparse: true
+    sparse: true,
   },
   googleEmail: String,
   googleDisplayName: String,
@@ -36,29 +39,13 @@ const userSchema = new Schema({
   facebookId: {
     type: String,
     unique: true,
-    sparse: true
+    sparse: true,
   },
   facebookEmail: String,
   facebookDisplayName: String,
-  facebookProfileUrl: String
+  facebookProfileUrl: String,
 });
-/*
-userSchema.pre("save", function(next) {
-  const user = this;
-  bcrypt.genSalt(10, function(err, salt) {
-    if (err) {
-      return next(err);
-    }
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      if (err) {
-        return next(err);
-      }
-      user.password = hash;
-      next();
-    });
-  });
-});
-*/
+
 userSchema.methods.registerUser = (newUser, callback) => {
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(newUser.password, salt, (errh, hash) => {
@@ -71,6 +58,7 @@ userSchema.methods.registerUser = (newUser, callback) => {
     });
   });
 };
+
 userSchema.methods.comparePassword = function(candidatePassword, callback) {
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
     if (err) return callback(err);
@@ -78,5 +66,6 @@ userSchema.methods.comparePassword = function(candidatePassword, callback) {
   });
 };
 
-const User = mongoose.model("users", userSchema);
-module.exports = User;
+const User = mongoose.model('User', userSchema);
+
+export default User;
