@@ -1,19 +1,10 @@
 import { Router } from 'express';
-import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 
 import User from '../models/User';
 import requireLocalAuth from '../middleware/requireLocalAuth';
 
 const router = Router();
-
-const tokenFromUser = user => {
-  const token = jwt.sign({}, process.env.JWT_SECRET_DEV, {
-    expiresIn: '12h',
-    subject: user.id,
-  });
-  return token;
-};
 
 router.post('/auth/login', requireLocalAuth, (req, res) => {
   const token = tokenFromUser(req.user);
@@ -65,16 +56,10 @@ router.post('/auth/register', async (req, res, next) => {
 
       newUser.registerUser(newUser, (err, user) => {
         if (err) throw err;
-        const token = tokenFromUser(user);
-        res.cookie('x-auth-cookie', token);
+        const token = user.generateJWT();
+        res.cookie('x-auth-cookie', token); // all strategies return token trough cookie
         res.json({
-          token,
-          user: {
-            id: user.id,
-            displayName: user.localDisplayName,
-            email: user.email,
-            provider: user.provider,
-          },
+          register: 'success', // return something
         });
       });
     } catch (err) {

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import passport from 'passport';
-import tokenFromUser from '../utils/utils';
 
 const router = Router();
 
@@ -18,7 +17,8 @@ router.get(
     session: false,
   }),
   (req, res) => {
-    const token = tokenFromUser(req.user);
+    // console.log(req.user);
+    const token = req.user.generateJWT();
     res.cookie('x-auth-cookie', token);
     res.redirect(process.env.SUCCESS_REDIRECT_URL_DEV);
   },

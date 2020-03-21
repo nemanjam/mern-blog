@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const { Schema } = mongoose;
 
@@ -11,6 +12,7 @@ const userSchema = new Schema({
 
   // local
   localDisplayName: String,
+  localPicture: String,
   email: {
     type: String,
     unique: true,
@@ -42,8 +44,31 @@ const userSchema = new Schema({
   },
   facebookEmail: String,
   facebookDisplayName: String,
-  facebookProfileUrl: String,
+  facebookPicture: String,
 });
+
+userSchema.methods.toAuthJSON = function() {
+  return {
+    id: this._id,
+    provider: this.provider,
+    email: this.email || this.googleEmail || this.facebookEmail,
+    displayName: this.localDisplayName || this.googleDisplayName || this.facebookDisplayName,
+    image: this.localPicture || this.googlePicture || this.facebookPicture,
+  };
+};
+
+userSchema.methods.generateJWT = function() {
+  const token = jwt.sign(
+    {
+      expiresIn: '12h',
+      id: this._id,
+      provider: this.provider,
+      email: this.email || this.googleEmail || this.facebookEmail,
+    },
+    process.env.JWT_SECRET_DEV,
+  );
+  return token;
+};
 
 userSchema.methods.registerUser = (newUser, callback) => {
   bcrypt.genSalt(10, (err, salt) => {

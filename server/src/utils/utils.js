@@ -1,9 +1,12 @@
 import jwt from 'jsonwebtoken';
 
-export const tokenFromUser = user => {
+/*
+export const tokenFromUser = (id, email) => {
   const token = jwt.sign({}, process.env.JWT_SECRET_DEV, {
     expiresIn: '12h',
-    subject: user.id,
+    id,
+    email,
   });
   return token;
 };
+*/

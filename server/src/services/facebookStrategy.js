@@ -20,10 +20,11 @@ const facebookLogin = new FacebookStrategy(
       'timezone',
       'updated_time',
       'verified',
+      'picture.type(large)',
     ],
   },
   async (accessToken, refreshToken, profile, done) => {
-    //console.log(profile);
+    // console.log(profile);
     try {
       const oldUser = await User.findOne({ facebookId: profile.id });
 
@@ -41,7 +42,7 @@ const facebookLogin = new FacebookStrategy(
         facebookId: profile.id,
         facebookEmail: profile.emails[0].value,
         facebookDisplayName: profile.displayName,
-        facebookProfileUrl: profile.profileUrl,
+        facebookPicture: profile.photos[0].value,
       }).save();
 
       done(null, newUser);
