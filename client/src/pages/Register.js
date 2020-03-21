@@ -1,23 +1,17 @@
-import React, { Component, Fragment } from 'react';
+import React, { useState, Fragment } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 
-// Externals
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { Field, reduxForm, formValueSelector, getFormMeta } from 'redux-form';
 import _ from 'lodash';
 
-// Material icons
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
-
-// Material helpers
-import { withStyles } from '@material-ui/core';
-
-// Material components
+import { makeStyles } from '@material-ui/core/styles';
 import {
   Button,
-  Checkbox,
   CircularProgress,
   Grid,
   IconButton,
@@ -27,7 +21,7 @@ import {
 
 import { registerUserWithEmail } from '../store/actions/authActions';
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     height: '100vh',
   },
@@ -76,14 +70,10 @@ const styles = theme => ({
     },
   },
   title: {
-    marginTop: theme.spacing(3),
-  },
-  subtitle: {
-    color: theme.palette.text.secondary,
-    marginTop: theme.spacing(0.5),
+    marginTop: theme.spacing(1),
   },
   fields: {
-    marginTop: theme.spacing(5),
+    marginTop: theme.spacing(3),
   },
   textField: {
     width: '100%',
@@ -141,187 +131,133 @@ const styles = theme => ({
     marginBottom: theme.spacing(1),
     marginTop: theme.spacing(2),
   },
+}));
+
+const registerSchema = Yup.object().shape({
+  fullName: Yup.string()
+    .min(2, 'Name must be 2 characters at minimum.')
+    .max(10, 'Name must be 10 characters at maximum.')
+    .required('Required'),
+  email: Yup.string()
+    .email('Invalid email')
+    .required('Required'),
+  password: Yup.string()
+    .min(2, 'Password must be 2 characters at minimum.')
+    .max(10, 'Password must be 10 characters at maximum.')
+    .required('Required'),
 });
 
-const renderTextField = ({ input, label, meta: { touched, error }, ...custom }) => (
-  <Fragment>
-    <TextField label={label} error={touched && !!error} {...input} {...custom} />
-    {touched && error && (
-      <Typography className={custom.errorclass} variant="body2">
-        {error}
-      </Typography>
-    )}
-  </Fragment>
-);
+const Register = ({ errors, auth, history, registerUserWithEmail }) => {
+  const [isLoading, setIsLoading] = useState(false);
 
-const renderCheckbox = ({ input, label }) => (
-  <Checkbox label={label} checked={input.value ? true : false} onChange={input.onChange} />
-);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-class Register extends Component {
-  state = { isLoading: false };
+  const onSubmit = event => {
+    event.preventDefault();
 
-  onSubmit = formProps => {
-    this.setState({ isLoading: true });
-    this.props.registerUserWithEmail(
-      formProps,
+    setIsLoading(true);
+    registerUserWithEmail(
+      { fullName, email, password },
       () => {
-        this.props.history.push('/login');
+        history.push('/login');
       },
       () => {
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       },
     );
   };
 
-  render() {
-    const {
-      classes,
-      errors,
-      handleSubmit,
-      pristine,
-      invalid,
-      submitting,
-      form,
-      policy,
-      meta,
-    } = this.props;
+  const onChange = event => {
+    const { name, value } = event.target;
+    if (name === 'fullName') setFullName(value);
+    if (name === 'email') setEmail(value);
+    if (name === 'password') setPassword(value);
+  };
 
-    const { isLoading } = this.state;
-    const showPolicyError = false;
+  const classes = useStyles();
 
-    return (
-      <div className={classes.root}>
-        <Grid className={classes.grid} container justify="center">
-          <Grid className={classes.content} item xs={6}>
-            <div className={classes.content}>
-              <div className={classes.contentHeader}>
-                <IconButton className={classes.backButton} component={Link} to="/">
-                  <ArrowBackIcon />
-                </IconButton>
-              </div>
-              <div className={classes.contentBody}>
-                <form onSubmit={handleSubmit(this.onSubmit.bind(this))} className={classes.form}>
-                  <Typography className={classes.title} variant="h4">
-                    Create new account
-                  </Typography>
-                  <Typography className={classes.subtitle} variant="body1">
-                    Use your work email to create new account... it's free.
-                  </Typography>
-                  <div className={classes.fields}>
-                    <Field
-                      className={classes.textField}
-                      variant="outlined"
-                      name="fullName"
-                      component={renderTextField}
-                      label="Full Name"
-                      errorclass={classes.fieldError}
-                    />
-                    <Field
-                      className={classes.textField}
-                      variant="outlined"
-                      name="email"
-                      component={renderTextField}
-                      label="Email address"
-                      errorclass={classes.fieldError}
-                    />
-                    <Field
-                      className={classes.textField}
-                      variant="outlined"
-                      name="password"
-                      component={renderTextField}
-                      label="Password"
-                      type="password"
-                      errorclass={classes.fieldError}
-                    />
-                    <div className={classes.policy}>
-                      <Field
-                        className={classes.policyCheckbox}
-                        name="policy"
-                        color="primary"
-                        component={renderCheckbox}
-                      />
-                      <Typography className={classes.policyText} variant="body1">
-                        I have read the &nbsp;
-                        <Link className={classes.policyUrl} to="#">
-                          Terms and Conditions
-                        </Link>
-                        .
-                      </Typography>
-                    </div>
-                    {meta['policy'] && meta['policy']['touched'] && !policy && (
-                      <Typography className={classes.fieldError} variant="body2">
-                        {'You must agree to the policy'}
-                      </Typography>
-                    )}
-                  </div>
-                  {errors && typeof errors !== 'object' && (
-                    <Typography className={classes.submitError} variant="body2">
-                      {errors.toString()}
-                    </Typography>
-                  )}
-                  {isLoading ? (
-                    <CircularProgress className={classes.progress} />
-                  ) : (
-                    <Button
-                      className={classes.signUpButton}
-                      color="primary"
-                      disabled={invalid || submitting || pristine}
-                      size="large"
-                      variant="contained"
-                      type="submit"
-                    >
-                      Sign up now
-                    </Button>
-                  )}
-                  <Typography className={classes.signIn} variant="body1">
-                    Have an account?{' '}
-                    <Link className={classes.signInUrl} to="/login">
-                      Log In
-                    </Link>
-                  </Typography>
-                </form>
-              </div>
+  return (
+    <div className={classes.root}>
+      <Grid className={classes.grid} container justify="center">
+        <Grid className={classes.content} item xs={6}>
+          <div className={classes.content}>
+            <div className={classes.contentHeader}>
+              <IconButton className={classes.backButton} component={Link} to="/">
+                <ArrowBackIcon />
+              </IconButton>
             </div>
-          </Grid>
+            <div className={classes.contentBody}>
+              <form onSubmit={onSubmit} className={classes.form} noValidate>
+                <Typography className={classes.title} variant="h4">
+                  Create new account
+                </Typography>
+                <div className={classes.fields}>
+                  <TextField
+                    label="Full Name"
+                    name="fullName"
+                    value={fullName}
+                    onChange={onChange}
+                    className={classes.textField}
+                  />
+                  <TextField
+                    label="Email address"
+                    name="email"
+                    value={email}
+                    onChange={onChange}
+                    className={classes.textField}
+                  />
+                  <TextField
+                    label="Password"
+                    name="password"
+                    value={password}
+                    onChange={onChange}
+                    className={classes.textField}
+                  />
+                </div>
+                {errors && typeof errors !== 'object' && (
+                  <Typography className={classes.submitError} variant="body2">
+                    {errors.toString()}
+                  </Typography>
+                )}
+                {isLoading ? (
+                  <CircularProgress className={classes.progress} />
+                ) : (
+                  <Button
+                    className={classes.signUpButton}
+                    color="primary"
+                    size="large"
+                    variant="contained"
+                    type="submit"
+                  >
+                    Sign up now
+                  </Button>
+                )}
+                <Typography className={classes.signIn} variant="body1">
+                  Have an account?{' '}
+                  <Link className={classes.signInUrl} to="/login">
+                    Log In
+                  </Link>
+                </Typography>
+              </form>
+            </div>
+          </div>
         </Grid>
-      </div>
-    );
-  }
-}
-
-Register.propTypes = {
-  className: PropTypes.string,
-  classes: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
+      </Grid>
+    </div>
+  );
 };
 
-const selector = formValueSelector('Register');
+// Register.propTypes = {
+//   className: PropTypes.string,
+//   classes: PropTypes.object.isRequired,
+//   history: PropTypes.object.isRequired,
+// };
 
 const mapStateToProps = state => ({
   auth: state.auth,
   errors: state.errors,
-  policy: selector(state, 'policy'),
-  meta: getFormMeta('Register')(state),
 });
 
-const validate = values => {
-  const errors = {};
-  const requiredFields = ['fullName', 'email', 'password'];
-  requiredFields.forEach(field => {
-    if (!values[field]) {
-      errors[field] = 'Field is required';
-    }
-  });
-  if (values.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = 'Invalid email address';
-  }
-  return errors;
-};
-
-export default compose(
-  withRouter,
-  connect(mapStateToProps, { registerUserWithEmail }),
-  reduxForm({ form: 'Register', validate, touchOnChange: true }),
-  withStyles(styles),
-)(Register);
+export default compose(withRouter, connect(mapStateToProps, { registerUserWithEmail }))(Register);

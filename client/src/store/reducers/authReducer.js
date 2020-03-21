@@ -1,11 +1,11 @@
 import {
-  LOGIN_SUCCESS,
-  LOGIN_FAIL,
+  LOGIN_WITH_OAUTH_SUCCESS,
+  LOGIN_WITH_OAUTH_FAIL,
   LOGOUT_SUCCESS,
-  REGISTER_USER_WITH_EMAIL_SUCCESS,
-  REGISTER_USER_WITH_EMAIL_FAIL,
-  LOGIN_USER_WITH_EMAIL_SUCCESS,
-  LOGIN_USER_WITH_EMAIL_FAIL,
+  REGISTER_WITH_EMAIL_SUCCESS,
+  REGISTER_WITH_EMAIL_FAIL,
+  LOGIN_WITH_EMAIL_SUCCESS,
+  LOGIN_WITH_EMAIL_FAIL,
 } from '../types';
 
 const initialState = {
@@ -17,8 +17,8 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case REGISTER_USER_WITH_EMAIL_SUCCESS:
-    case LOGIN_USER_WITH_EMAIL_SUCCESS:
+    case REGISTER_WITH_EMAIL_SUCCESS:
+    case LOGIN_WITH_EMAIL_SUCCESS:
       localStorage.setItem('token', action.payload.token);
       return {
         ...state,
@@ -26,7 +26,7 @@ export default function(state = initialState, action) {
         isLoading: false,
         token: action.payload.token,
       };
-    case LOGIN_SUCCESS:
+    case LOGIN_WITH_OAUTH_SUCCESS:
       return {
         ...state,
         isAuthenticated: true,

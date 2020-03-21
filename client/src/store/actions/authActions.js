@@ -3,23 +3,22 @@ import Cookies from 'js-cookie';
 
 import {
   SET_ERROR,
-  LOGIN_SUCCESS,
-  LOGIN_FAIL,
+  LOGIN_WITH_OAUTH_SUCCESS,
+  LOGIN_WITH_OAUTH_FAIL,
   LOGOUT_SUCCESS,
-  REGISTER_USER_WITH_EMAIL_SUCCESS,
-  REGISTER_USER_WITH_EMAIL_FAIL,
-  LOGIN_USER_WITH_EMAIL_SUCCESS,
-  LOGIN_USER_WITH_EMAIL_FAIL,
+  REGISTER_WITH_EMAIL_SUCCESS,
+  REGISTER_WITH_EMAIL_FAIL,
+  LOGIN_WITH_EMAIL_SUCCESS,
+  LOGIN_WITH_EMAIL_FAIL,
 } from '../types';
 
 export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, getState) => {
   try {
     const response = await axios.post('/auth/register', formData);
-    console.log('formData', formData, 'response', response);
-
+    console.log(formData, response);
     dispatch({
-      type: REGISTER_USER_WITH_EMAIL_SUCCESS,
-      payload: response.data,
+      type: REGISTER_WITH_EMAIL_SUCCESS,
+      payload: { token: response.data.token },
     });
     cb();
   } catch (err) {
@@ -28,7 +27,7 @@ export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, g
       payload: err.response.data,
     });
     dispatch({
-      type: REGISTER_USER_WITH_EMAIL_FAIL,
+      type: REGISTER_WITH_EMAIL_FAIL,
     });
     cbErr();
   }
@@ -38,7 +37,7 @@ export const loginUserWithEmail = (formData, cb, cbErr) => async (dispatch, getS
   try {
     const response = await axios.post('/auth/login', formData);
     dispatch({
-      type: LOGIN_USER_WITH_EMAIL_SUCCESS,
+      type: LOGIN_WITH_EMAIL_SUCCESS,
     });
     cb();
   } catch (err) {
@@ -66,7 +65,7 @@ export const logInUser = () => async (dispatch, getState) => {
       Cookies.remove('x-auth-cookie'); //delete just that cookie
 
       dispatch({
-        type: LOGIN_SUCCESS,
+        type: LOGIN_WITH_OAUTH_SUCCESS,
         payload: response.data.user,
       });
       return;
@@ -81,7 +80,7 @@ export const logInUser = () => async (dispatch, getState) => {
 
       const response = await axios.get('/api/user', { headers });
       dispatch({
-        type: LOGIN_SUCCESS,
+        type: LOGIN_WITH_OAUTH_SUCCESS,
         payload: response.data.user,
       });
       return;

@@ -8,7 +8,6 @@ const router = Router();
 
 router.post('/auth/login', requireLocalAuth, (req, res) => {
   const token = tokenFromUser(req.user);
-  res.cookie('x-auth-cookie', token);
   res.json({ token });
 });
 
@@ -28,7 +27,6 @@ router.post('/auth/register', async (req, res, next) => {
       .min(6)
       .max(12)
       .required(),
-    policy: Joi.boolean().required(),
   });
 
   let form;
@@ -57,10 +55,8 @@ router.post('/auth/register', async (req, res, next) => {
       newUser.registerUser(newUser, (err, user) => {
         if (err) throw err;
         const token = user.generateJWT();
-        res.cookie('x-auth-cookie', token); // all strategies return token trough cookie
-        res.json({
-          register: 'success', // return something
-        });
+        // res.cookie('x-auth-cookie', token); // ne moze cookie za api
+        res.json({ token });
       });
     } catch (err) {
       return next(err);
