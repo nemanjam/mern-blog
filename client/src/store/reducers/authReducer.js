@@ -1,13 +1,8 @@
-import {
-  LOGIN_USER,
-  LOGOUT_USER,
-  REGISTER_USER_WITH_EMAIL,
-  LOGIN_USER_WITH_EMAIL
-} from "../actions/types";
+import { LOGIN_USER, LOGOUT_USER, REGISTER_USER_WITH_EMAIL, LOGIN_USER_WITH_EMAIL } from '../types';
 
 const initialState = {
   isAuthenticated: false,
-  user: {}
+  user: {},
 };
 
 export default function(state = initialState, action) {
@@ -16,7 +11,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isAuthenticated: true,
-        user: action.payload
+        user: action.payload,
       };
     case REGISTER_USER_WITH_EMAIL:
     case LOGIN_USER_WITH_EMAIL:
@@ -25,7 +20,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isAuthenticated: false,
-        user: null
+        user: null,
       };
     default:
       return state;

@@ -1,8 +1,8 @@
-import { GET_FEATURE, GET_PROFILE } from "../actions/types";
+import { GET_FEATURE, GET_PROFILE } from '../types';
 
 const initialState = {
-  message: "",
-  profile: {}
+  message: '',
+  profile: {},
 };
 
 export default function(state = initialState, action) {
@@ -10,12 +10,12 @@ export default function(state = initialState, action) {
     case GET_FEATURE:
       return {
         ...state,
-        message: action.payload
+        message: action.payload,
       };
     case GET_PROFILE:
       return {
         ...state,
-        profile: action.payload
+        profile: action.payload,
       };
     default:
       return state;

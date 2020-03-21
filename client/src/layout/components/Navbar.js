@@ -1,54 +1,54 @@
-import React, { Component } from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { Link, withRouter } from "react-router-dom";
+import React, { Component } from 'react';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
 
-import { logInUser, logOutUser } from "../../actions/authActions";
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
+import IconButton from '@material-ui/core/IconButton';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import ExitToApp from '@material-ui/icons/ExitToApp';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
 
-import IconButton from "@material-ui/core/IconButton";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import ExitToApp from "@material-ui/icons/ExitToApp";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
+import { logInUser, logOutUser } from '../../store/actions/authActions';
 
 const styles = theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   grow: {
     flexGrow: 1,
-    marginLeft: 20
+    marginLeft: 20,
   },
   menuButton: {
     marginLeft: -12,
-    marginRight: 20
+    marginRight: 20,
   },
   noWrap: {
-    whiteSpace: "nowrap"
+    whiteSpace: 'nowrap',
   },
   toolbarButtons: {
-    marginLeft: "auto"
+    marginLeft: 'auto',
   },
   rightIcon: {
     marginLeft: theme.spacing(1),
     //border: '1px solid white',
-    width: "20px",
-    height: "20px"
+    width: '20px',
+    height: '20px',
     //borderRadius: 4,
     //background: 'white'
-  }
+  },
 });
 
 class Navbar extends Component {
   state = {
-    anchorEl: null
+    anchorEl: null,
   };
 
   handleMenu = event => {
@@ -61,12 +61,12 @@ class Navbar extends Component {
 
   onLogOut = () => {
     this.props.logOutUser(() => {
-      this.props.history.push("/");
+      this.props.history.push('/');
     });
   };
 
   componentDidMount() {
-    if (window.location.hash === "#_=_") window.location.hash = "";
+    if (window.location.hash === '#_=_') window.location.hash = '';
     this.props.logInUser();
     // console.log('store: ', this.props.auth);
   }
@@ -79,12 +79,7 @@ class Navbar extends Component {
       <div className={classes.root}>
         <AppBar>
           <Toolbar>
-            <Typography
-              variant="h6"
-              noWrap
-              color="inherit"
-              style={{ marginRight: "20px" }}
-            >
+            <Typography variant="h6" noWrap color="inherit" style={{ marginRight: '20px' }}>
               Mern
             </Typography>
             <Button color="inherit" component={Link} to="/">
@@ -99,7 +94,7 @@ class Navbar extends Component {
               {auth.isAuthenticated ? (
                 <div>
                   <IconButton
-                    aria-owns={Boolean(anchorEl) ? "menu-appbar" : undefined}
+                    aria-owns={Boolean(anchorEl) ? 'menu-appbar' : undefined}
                     aria-haspopup="true"
                     onClick={this.handleMenu}
                     color="inherit"
@@ -110,12 +105,12 @@ class Navbar extends Component {
                     id="menu-appbar"
                     anchorEl={anchorEl}
                     anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "right"
+                      vertical: 'top',
+                      horizontal: 'right',
                     }}
                     transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right"
+                      vertical: 'top',
+                      horizontal: 'right',
                     }}
                     open={Boolean(anchorEl)}
                     onClose={this.handleClose}
@@ -135,12 +130,7 @@ class Navbar extends Component {
                   </Menu>
                 </div>
               ) : (
-                <Button
-                  className={classes.noWrap}
-                  color="inherit"
-                  component={Link}
-                  to="/login"
-                >
+                <Button className={classes.noWrap} color="inherit" component={Link} to="/login">
                   Login
                 </Button>
               )}
@@ -153,19 +143,16 @@ class Navbar extends Component {
 }
 
 Navbar.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  errors: state.errors
+  errors: state.errors,
 });
 
 export default compose(
   withRouter,
-  connect(
-    mapStateToProps,
-    { logInUser, logOutUser }
-  ),
-  withStyles(styles)
+  connect(mapStateToProps, { logInUser, logOutUser }),
+  withStyles(styles),
 )(Navbar);

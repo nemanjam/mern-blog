@@ -1,13 +1,28 @@
-import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Provider } from "react-redux";
-import store from "./store";
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, compose } from 'redux';
+import thunk from 'redux-thunk';
 
-import Login from "./views/Login";
-import Register from "./views/Register";
-import Home from "./views/Home";
-import Profile from "./views/Private/Profile";
-import Feature from "./views/Private/Feature";
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Home from './pages/Home';
+import Profile from './pages/private/Profile';
+import Feature from './pages/private/Feature';
+import rootReducer from './store/reducers';
+
+const initialState = {};
+
+const store = createStore(
+  rootReducer,
+  initialState,
+  compose(
+    applyMiddleware(thunk),
+    (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ &&
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__()) ||
+      compose,
+  ),
+);
 
 class App extends Component {
   render() {

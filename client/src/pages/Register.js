@@ -1,18 +1,18 @@
-import React, { Component, Fragment } from "react";
-import { Link, withRouter } from "react-router-dom";
+import React, { Component, Fragment } from 'react';
+import { Link, withRouter } from 'react-router-dom';
 
 // Externals
-import PropTypes from "prop-types";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { Field, reduxForm, formValueSelector, getFormMeta } from "redux-form";
-import _ from "lodash";
+import PropTypes from 'prop-types';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { Field, reduxForm, formValueSelector, getFormMeta } from 'redux-form';
+import _ from 'lodash';
 
 // Material icons
-import { ArrowBack as ArrowBackIcon } from "@material-ui/icons";
+import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 
 // Material helpers
-import { withStyles } from "@material-ui/core";
+import { withStyles } from '@material-ui/core';
 
 // Material components
 import {
@@ -22,140 +22,130 @@ import {
   Grid,
   IconButton,
   TextField,
-  Typography
-} from "@material-ui/core";
+  Typography,
+} from '@material-ui/core';
 
-import { registerUserWithEmail } from "../actions/authActions";
+import { registerUserWithEmail } from '../store/actions/authActions';
 
 const styles = theme => ({
   root: {
-    height: "100vh"
+    height: '100vh',
   },
   grid: {
-    height: "100%"
+    height: '100%',
   },
   name: {
     marginTop: theme.spacing(3),
-    color: theme.palette.common.white
+    color: theme.palette.common.white,
   },
   bio: {
-    color: theme.palette.common.white
+    color: theme.palette.common.white,
   },
   contentWrapper: {},
   content: {
-    height: "100%",
-    display: "flex",
-    flexDirection: "column"
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   },
   contentHeader: {
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
     paddingTop: theme.spacing(5),
     paddingBototm: theme.spacing(2),
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2)
+    paddingRight: theme.spacing(2),
   },
   backButton: {},
   logoImage: {
-    marginLeft: theme.spacing(4)
+    marginLeft: theme.spacing(4),
   },
   contentBody: {
     flexGrow: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   form: {
-    paddingLeft: "100px",
-    paddingRight: "100px",
-    paddingBottom: "125px",
-    flexBasis: "700px",
-    [theme.breakpoints.down("sm")]: {
+    paddingLeft: '100px',
+    paddingRight: '100px',
+    paddingBottom: '125px',
+    flexBasis: '700px',
+    [theme.breakpoints.down('sm')]: {
       paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(2)
-    }
+      paddingRight: theme.spacing(2),
+    },
   },
   title: {
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   subtitle: {
     color: theme.palette.text.secondary,
-    marginTop: theme.spacing(0.5)
+    marginTop: theme.spacing(0.5),
   },
   fields: {
-    marginTop: theme.spacing(5)
+    marginTop: theme.spacing(5),
   },
   textField: {
-    width: "100%",
-    "& + & ": {
-      marginTop: theme.spacing(2)
-    }
+    width: '100%',
+    '& + & ': {
+      marginTop: theme.spacing(2),
+    },
   },
   policy: {
-    display: "flex",
-    alignItems: "center"
+    display: 'flex',
+    alignItems: 'center',
   },
   policyCheckbox: {
-    marginLeft: "-10px"
+    marginLeft: '-10px',
   },
   policyText: {
-    display: "inline",
-    color: theme.palette.text.secondary
+    display: 'inline',
+    color: theme.palette.text.secondary,
   },
   policyUrl: {
     color: theme.palette.text.primary,
-    "&:hover": {
-      cursor: "pointer",
-      color: theme.palette.primary.main
-    }
+    '&:hover': {
+      cursor: 'pointer',
+      color: theme.palette.primary.main,
+    },
   },
   progress: {
-    display: "block",
+    display: 'block',
     marginTop: theme.spacing(2),
-    marginLeft: "auto",
-    marginRight: "auto"
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   signUpButton: {
     marginTop: theme.spacing(2),
-    width: "100%"
+    width: '100%',
   },
   signIn: {
     marginTop: theme.spacing(2),
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
   },
   signInUrl: {
     color: theme.palette.primary.main,
-    fontWeight: "bold",
-    "&:hover": {
-      color: theme.palette.primary.main
-    }
+    fontWeight: 'bold',
+    '&:hover': {
+      color: theme.palette.primary.main,
+    },
   },
   fieldError: {
-    color: "red",
+    color: 'red',
     marginBottom: theme.spacing(2),
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   submitError: {
-    color: "red",
-    alignText: "center",
+    color: 'red',
+    alignText: 'center',
     marginBottom: theme.spacing(1),
-    marginTop: theme.spacing(2)
-  }
+    marginTop: theme.spacing(2),
+  },
 });
 
-const renderTextField = ({
-  input,
-  label,
-  meta: { touched, error },
-  ...custom
-}) => (
+const renderTextField = ({ input, label, meta: { touched, error }, ...custom }) => (
   <Fragment>
-    <TextField
-      label={label}
-      error={touched && !!error}
-      {...input}
-      {...custom}
-    />
+    <TextField label={label} error={touched && !!error} {...input} {...custom} />
     {touched && error && (
       <Typography className={custom.errorclass} variant="body2">
         {error}
@@ -165,11 +155,7 @@ const renderTextField = ({
 );
 
 const renderCheckbox = ({ input, label }) => (
-  <Checkbox
-    label={label}
-    checked={input.value ? true : false}
-    onChange={input.onChange}
-  />
+  <Checkbox label={label} checked={input.value ? true : false} onChange={input.onChange} />
 );
 
 class Register extends Component {
@@ -180,11 +166,11 @@ class Register extends Component {
     this.props.registerUserWithEmail(
       formProps,
       () => {
-        this.props.history.push("/login");
+        this.props.history.push('/login');
       },
       () => {
         this.setState({ isLoading: false });
-      }
+      },
     );
   };
 
@@ -198,7 +184,7 @@ class Register extends Component {
       submitting,
       form,
       policy,
-      meta
+      meta,
     } = this.props;
 
     const { isLoading } = this.state;
@@ -210,19 +196,12 @@ class Register extends Component {
           <Grid className={classes.content} item xs={6}>
             <div className={classes.content}>
               <div className={classes.contentHeader}>
-                <IconButton
-                  className={classes.backButton}
-                  component={Link}
-                  to="/"
-                >
+                <IconButton className={classes.backButton} component={Link} to="/">
                   <ArrowBackIcon />
                 </IconButton>
               </div>
               <div className={classes.contentBody}>
-                <form
-                  onSubmit={handleSubmit(this.onSubmit.bind(this))}
-                  className={classes.form}
-                >
+                <form onSubmit={handleSubmit(this.onSubmit.bind(this))} className={classes.form}>
                   <Typography className={classes.title} variant="h4">
                     Create new account
                   </Typography>
@@ -270,10 +249,7 @@ class Register extends Component {
                         color="primary"
                         component={renderCheckbox}
                       />
-                      <Typography
-                        className={classes.policyText}
-                        variant="body1"
-                      >
+                      <Typography className={classes.policyText} variant="body1">
                         I have read the &nbsp;
                         <Link className={classes.policyUrl} to="#">
                           Terms and Conditions
@@ -281,16 +257,13 @@ class Register extends Component {
                         .
                       </Typography>
                     </div>
-                    {meta["policy"] && meta["policy"]["touched"] && !policy && (
-                      <Typography
-                        className={classes.fieldError}
-                        variant="body2"
-                      >
-                        {"You must agree to the policy"}
+                    {meta['policy'] && meta['policy']['touched'] && !policy && (
+                      <Typography className={classes.fieldError} variant="body2">
+                        {'You must agree to the policy'}
                       </Typography>
                     )}
                   </div>
-                  {errors && typeof errors !== "object" && (
+                  {errors && typeof errors !== 'object' && (
                     <Typography className={classes.submitError} variant="body2">
                       {errors.toString()}
                     </Typography>
@@ -310,7 +283,7 @@ class Register extends Component {
                     </Button>
                   )}
                   <Typography className={classes.signIn} variant="body1">
-                    Have an account?{" "}
+                    Have an account?{' '}
                     <Link className={classes.signInUrl} to="/login">
                       Log In
                     </Link>
@@ -328,41 +301,35 @@ class Register extends Component {
 Register.propTypes = {
   className: PropTypes.string,
   classes: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
 };
 
-const selector = formValueSelector("Register");
+const selector = formValueSelector('Register');
 
 const mapStateToProps = state => ({
   auth: state.auth,
   errors: state.errors,
-  policy: selector(state, "policy"),
-  meta: getFormMeta("Register")(state)
+  policy: selector(state, 'policy'),
+  meta: getFormMeta('Register')(state),
 });
 
 const validate = values => {
   const errors = {};
-  const requiredFields = ["firstName", "lastName", "email", "password"];
+  const requiredFields = ['firstName', 'lastName', 'email', 'password'];
   requiredFields.forEach(field => {
     if (!values[field]) {
-      errors[field] = "Field is required";
+      errors[field] = 'Field is required';
     }
   });
-  if (
-    values.email &&
-    !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
-  ) {
-    errors.email = "Invalid email address";
+  if (values.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = 'Invalid email address';
   }
   return errors;
 };
 
 export default compose(
   withRouter,
-  connect(
-    mapStateToProps,
-    { registerUserWithEmail }
-  ),
-  reduxForm({ form: "Register", validate, touchOnChange: true }),
-  withStyles(styles)
+  connect(mapStateToProps, { registerUserWithEmail }),
+  reduxForm({ form: 'Register', validate, touchOnChange: true }),
+  withStyles(styles),
 )(Register);
