@@ -5,11 +5,8 @@ import { GET_FEATURE, GET_PROFILE, SET_ERROR } from '../types';
 
 export const getProfile = () => async (dispatch, getState) => {
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'x-auth-token': localStorage.getItem('token'),
-    };
-    const response = await axios.get('/api/profile', { headers });
+    const options = attachTokenToHeaders(getState);
+    const response = await axios.get('/api/profile', options);
 
     dispatch({
       type: GET_PROFILE,
@@ -25,12 +22,8 @@ export const getProfile = () => async (dispatch, getState) => {
 
 export const getFeature = () => async (dispatch, getState) => {
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'x-auth-token': localStorage.getItem('token'),
-    };
-
-    const response = await axios.get('/api/feature', { headers });
+    const options = attachTokenToHeaders(getState);
+    const response = await axios.get('/api/feature', options);
 
     dispatch({
       type: GET_FEATURE,

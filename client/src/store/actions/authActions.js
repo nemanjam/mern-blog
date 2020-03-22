@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 
 import {
   SET_ERROR,
+  LOGIN_WITH_OAUTH_LOADING,
   LOGIN_WITH_OAUTH_SUCCESS,
   LOGIN_WITH_OAUTH_FAIL,
   LOGOUT_SUCCESS,
@@ -86,45 +87,26 @@ export const loginUserWithEmail = (formData, cb, cbErr) => async (dispatch, getS
   }
 };
 
-// Login - get user token
-export const logInUser = () => async (dispatch, getState) => {
+export const logInUserWithOuth = token => async (dispatch, getState) => {
+  dispatch({ type: LOGIN_WITH_OAUTH_LOADING });
+
   try {
-    // register
-    const cookieJwt = Cookies.get('x-auth-cookie');
-    if (cookieJwt) {
-      const headers = {
-        'Content-Type': 'application/json',
-        'x-auth-token': cookieJwt,
-      };
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-auth-token': token,
+    };
 
-      const response = await axios.get('/api/user', { headers });
-      localStorage.setItem('token', cookieJwt);
-      Cookies.remove('x-auth-cookie'); //delete just that cookie
+    const response = await axios.get('/api/me', { headers });
 
-      dispatch({
-        type: LOGIN_WITH_OAUTH_SUCCESS,
-        payload: response.data.user,
-      });
-      return;
-    }
-    // logged in
-    const token = localStorage.getItem('token');
-    if (token) {
-      const headers = {
-        'Content-Type': 'application/json',
-        'x-auth-token': token,
-      };
-
-      const response = await axios.get('/api/user', { headers });
-      dispatch({
-        type: LOGIN_WITH_OAUTH_SUCCESS,
-        payload: response.data.user,
-      });
-      return;
-    }
+    dispatch({
+      type: LOGIN_WITH_OAUTH_SUCCESS,
+      payload: { me: response.data.me, token },
+    });
   } catch (err) {
-    localStorage.removeItem('token');
-    Cookies.remove('x-auth-cookie');
+    dispatch({
+      type: LOGIN_WITH_OAUTH_FAIL,
+    });
+
     dispatch({
       type: SET_ERROR,
       payload: err.response.data,
@@ -135,13 +117,11 @@ export const logInUser = () => async (dispatch, getState) => {
 // Log user out
 export const logOutUser = cb => async dispatch => {
   try {
-    localStorage.removeItem('token');
     deleteAllCookies();
     await axios.get('/auth/logout');
 
     dispatch({
       type: LOGOUT_SUCCESS,
-      payload: false,
     });
     cb();
   } catch (err) {
