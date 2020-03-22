@@ -6,8 +6,10 @@ import {
   LOGIN_WITH_OAUTH_SUCCESS,
   LOGIN_WITH_OAUTH_FAIL,
   LOGOUT_SUCCESS,
+  REGISTER_WITH_EMAIL_LOADING,
   REGISTER_WITH_EMAIL_SUCCESS,
   REGISTER_WITH_EMAIL_FAIL,
+  LOGIN_WITH_EMAIL_LOADING,
   LOGIN_WITH_EMAIL_SUCCESS,
   LOGIN_WITH_EMAIL_FAIL,
   ME_LOADING,
@@ -40,12 +42,11 @@ export const loadMe = () => async (dispatch, getState) => {
 };
 
 export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, getState) => {
+  dispatch({ type: REGISTER_WITH_EMAIL_LOADING });
   try {
     const response = await axios.post('/auth/register', formData);
-    console.log(formData, response);
     dispatch({
       type: REGISTER_WITH_EMAIL_SUCCESS,
-      payload: { token: response.data.token },
     });
     cb();
   } catch (err) {
@@ -62,13 +63,13 @@ export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, g
 };
 
 export const loginUserWithEmail = (formData, cb, cbErr) => async (dispatch, getState) => {
+  dispatch({ type: LOGIN_WITH_EMAIL_LOADING });
   try {
     const response = await axios.post('/auth/login', formData);
-    console.log(formData, response);
 
     dispatch({
       type: LOGIN_WITH_EMAIL_SUCCESS,
-      payload: { token: response.data.token },
+      payload: { token: response.data.token, me: response.data.me },
     });
     cb();
   } catch (err) {

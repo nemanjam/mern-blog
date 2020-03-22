@@ -34,7 +34,6 @@ const Navbar = ({ auth, logOutUser, logInUser, loadMe, history }) => {
 
   useEffect(() => {
     if (window.location.hash === '#_=_') window.location.hash = '';
-    loadMe();
   }, []);
 
   const handleMenu = event => {

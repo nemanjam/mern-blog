@@ -14,7 +14,7 @@ const jwtLogin = new JwtStrategy(
   },
   async (payload, done) => {
     try {
-      const user = await User.findById(payload.sub);
+      const user = await User.findById(payload.id);
 
       if (user) {
         done(null, user);

@@ -2,8 +2,10 @@ import {
   LOGIN_WITH_OAUTH_SUCCESS,
   LOGIN_WITH_OAUTH_FAIL,
   LOGOUT_SUCCESS,
+  REGISTER_WITH_EMAIL_LOADING,
   REGISTER_WITH_EMAIL_SUCCESS,
   REGISTER_WITH_EMAIL_FAIL,
+  LOGIN_WITH_EMAIL_LOADING,
   LOGIN_WITH_EMAIL_SUCCESS,
   LOGIN_WITH_EMAIL_FAIL,
   ME_LOADING,
@@ -20,7 +22,18 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
+    case REGISTER_WITH_EMAIL_LOADING:
+    case LOGIN_WITH_EMAIL_LOADING:
+    case ME_LOADING:
+      return {
+        ...state,
+        isLoading: true,
+      };
     case REGISTER_WITH_EMAIL_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+      };
     case LOGIN_WITH_EMAIL_SUCCESS:
       localStorage.setItem('token', action.payload.token);
       return {
@@ -28,11 +41,7 @@ export default function(state = initialState, action) {
         isAuthenticated: true,
         isLoading: false,
         token: action.payload.token,
-      };
-    case ME_LOADING:
-      return {
-        ...state,
-        isLoading: true,
+        me: action.payload.me,
       };
     case ME_SUCCESS:
       return {

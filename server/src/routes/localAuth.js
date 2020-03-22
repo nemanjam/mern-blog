@@ -8,7 +8,8 @@ const router = Router();
 
 router.post('/auth/login', requireLocalAuth, (req, res) => {
   const token = req.user.generateJWT();
-  res.json({ token });
+  const me = req.user.toAuthJSON();
+  res.json({ token, me });
 });
 
 router.post('/auth/register', async (req, res, next) => {
@@ -54,9 +55,7 @@ router.post('/auth/register', async (req, res, next) => {
 
       newUser.registerUser(newUser, (err, user) => {
         if (err) throw err;
-        const token = user.generateJWT();
-        // res.cookie('x-auth-cookie', token); // ne moze cookie za api
-        res.json({ token });
+        res.json({ register: true }); // just redirect to login
       });
     } catch (err) {
       return next(err);

@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { attachTokenToHeaders } from './authActions';
 import { GET_FEATURE, GET_PROFILE, SET_ERROR } from '../types';
 
 export const getProfile = () => async (dispatch, getState) => {
@@ -8,7 +9,7 @@ export const getProfile = () => async (dispatch, getState) => {
       'Content-Type': 'application/json',
       'x-auth-token': localStorage.getItem('token'),
     };
-    const response = await axios.post('/api/profile', null, { headers });
+    const response = await axios.get('/api/profile', { headers });
 
     dispatch({
       type: GET_PROFILE,
@@ -28,7 +29,8 @@ export const getFeature = () => async (dispatch, getState) => {
       'Content-Type': 'application/json',
       'x-auth-token': localStorage.getItem('token'),
     };
-    const response = await axios.post('/api/feature', null, { headers });
+
+    const response = await axios.get('/api/feature', { headers });
 
     dispatch({
       type: GET_FEATURE,

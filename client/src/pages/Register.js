@@ -148,8 +148,6 @@ const registerSchema = Yup.object().shape({
 });
 
 const Register = ({ errors, auth, history, registerUserWithEmail }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -157,15 +155,12 @@ const Register = ({ errors, auth, history, registerUserWithEmail }) => {
   const onSubmit = event => {
     event.preventDefault();
 
-    setIsLoading(true);
     registerUserWithEmail(
       { fullName, email, password },
       () => {
         history.push('/login');
       },
-      () => {
-        setIsLoading(false);
-      },
+      () => {},
     );
   };
 
@@ -225,7 +220,7 @@ const Register = ({ errors, auth, history, registerUserWithEmail }) => {
                     {errors.toString()}
                   </Typography>
                 )}
-                {isLoading ? (
+                {auth.isLoading ? (
                   <CircularProgress className={classes.progress} />
                 ) : (
                   <Button
