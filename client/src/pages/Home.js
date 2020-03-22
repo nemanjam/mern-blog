@@ -14,7 +14,7 @@ const Home = ({ auth }) => {
       {!auth.isAuthenticated ? (
         <h1>Welcome! Log in or register!</h1>
       ) : (
-        <h1>Welcome {auth.user.displayName}!</h1>
+        <h1>Welcome {auth.me.displayName}!</h1>
       )}
     </Layout>
   );

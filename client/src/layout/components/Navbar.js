@@ -15,7 +15,7 @@ import ExitToApp from '@material-ui/icons/ExitToApp';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 
-import { logInUser, logOutUser } from '../../store/actions/authActions';
+import { logInUser, logOutUser, loadMe } from '../../store/actions/authActions';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -29,12 +29,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Navbar = ({ auth, logOutUser, logInUser, history }) => {
+const Navbar = ({ auth, logOutUser, logInUser, loadMe, history }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     if (window.location.hash === '#_=_') window.location.hash = '';
-    logInUser();
+    loadMe();
   }, []);
 
   const handleMenu = event => {
@@ -128,4 +128,7 @@ const mapStateToProps = state => ({
   errors: state.errors,
 });
 
-export default compose(withRouter, connect(mapStateToProps, { logInUser, logOutUser }))(Navbar);
+export default compose(
+  withRouter,
+  connect(mapStateToProps, { logInUser, logOutUser, loadMe }),
+)(Navbar);

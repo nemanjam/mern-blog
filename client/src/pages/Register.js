@@ -200,6 +200,7 @@ const Register = ({ errors, auth, history, registerUserWithEmail }) => {
                     value={fullName}
                     onChange={onChange}
                     className={classes.textField}
+                    variant="outlined"
                   />
                   <TextField
                     label="Email address"
@@ -207,6 +208,7 @@ const Register = ({ errors, auth, history, registerUserWithEmail }) => {
                     value={email}
                     onChange={onChange}
                     className={classes.textField}
+                    variant="outlined"
                   />
                   <TextField
                     label="Password"
@@ -214,6 +216,8 @@ const Register = ({ errors, auth, history, registerUserWithEmail }) => {
                     value={password}
                     onChange={onChange}
                     className={classes.textField}
+                    variant="outlined"
+                    type="password"
                   />
                 </div>
                 {errors && typeof errors !== 'object' && (

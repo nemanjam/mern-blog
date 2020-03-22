@@ -7,7 +7,7 @@ import requireLocalAuth from '../middleware/requireLocalAuth';
 const router = Router();
 
 router.post('/auth/login', requireLocalAuth, (req, res) => {
-  const token = tokenFromUser(req.user);
+  const token = req.user.generateJWT();
   res.json({ token });
 });
 

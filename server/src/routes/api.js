@@ -3,12 +3,10 @@ import requireJwtAuth from '../middleware/requireJwtAuth';
 
 const router = Router();
 
-router.get('/api/user', requireJwtAuth, (req, res) => {
-  res.send({
-    user: {
-      displayName: req.user.firstName || req.user.googleDisplayName || req.user.facebookDisplayName,
-    },
-  });
+// for local, fb, google
+router.get('/api/me', requireJwtAuth, (req, res) => {
+  const user = req.user.toAuthJSON();
+  res.send({ user });
 });
 
 router.post('/api/feature', requireJwtAuth, (req, res) => {

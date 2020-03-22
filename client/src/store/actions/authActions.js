@@ -10,7 +10,34 @@ import {
   REGISTER_WITH_EMAIL_FAIL,
   LOGIN_WITH_EMAIL_SUCCESS,
   LOGIN_WITH_EMAIL_FAIL,
+  ME_LOADING,
+  ME_SUCCESS,
+  ME_FAIL,
 } from '../types';
+
+export const loadMe = () => async (dispatch, getState) => {
+  dispatch({ type: ME_LOADING });
+
+  try {
+    const options = attachTokenToHeaders(getState);
+    const response = await axios.get('/api/me', options);
+
+    console.log(response);
+    dispatch({
+      type: ME_SUCCESS,
+      payload: { token: response.data },
+    });
+  } catch (err) {
+    dispatch({
+      type: SET_ERROR,
+      payload: err.response.data,
+    });
+
+    dispatch({
+      type: ME_FAIL,
+    });
+  }
+};
 
 export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, getState) => {
   try {
@@ -26,6 +53,7 @@ export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, g
       type: SET_ERROR,
       payload: err.response.data,
     });
+
     dispatch({
       type: REGISTER_WITH_EMAIL_FAIL,
     });
@@ -36,14 +64,22 @@ export const registerUserWithEmail = (formData, cb, cbErr) => async (dispatch, g
 export const loginUserWithEmail = (formData, cb, cbErr) => async (dispatch, getState) => {
   try {
     const response = await axios.post('/auth/login', formData);
+    console.log(formData, response);
+
     dispatch({
       type: LOGIN_WITH_EMAIL_SUCCESS,
+      payload: { token: response.data.token },
     });
     cb();
   } catch (err) {
+    console.log(err);
     dispatch({
       type: SET_ERROR,
-      payload: err.response.data,
+      //payload: err.response.data,
+    });
+
+    dispatch({
+      type: LOGIN_WITH_EMAIL_FAIL,
     });
     cbErr();
   }
@@ -126,3 +162,19 @@ function deleteAllCookies() {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
   }
 }
+
+export const attachTokenToHeaders = getState => {
+  const token = getState().auth.token;
+
+  const config = {
+    headers: {
+      'Content-type': 'application/json',
+    },
+  };
+
+  if (token) {
+    config.headers['x-auth-token'] = token;
+  }
+
+  return config;
+};
