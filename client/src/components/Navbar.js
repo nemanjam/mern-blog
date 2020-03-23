@@ -16,7 +16,7 @@ import ExitToApp from '@material-ui/icons/ExitToApp';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 
-import { logInUserWithOuth, logOutUser, loadMe } from '../../store/actions/authActions';
+import { logInUserWithOuth, logOutUser, loadMe } from '../store/actions/authActions';
 
 const useStyles = makeStyles(theme => ({
   root: {
