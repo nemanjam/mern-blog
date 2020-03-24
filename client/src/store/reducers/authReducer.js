@@ -51,7 +51,7 @@ export default function(state = initialState, action) {
         ...state,
         isAuthenticated: true,
         isLoading: false,
-        me: action.payload,
+        me: action.payload.me,
       };
     case LOGOUT_SUCCESS:
     case ME_FAIL:

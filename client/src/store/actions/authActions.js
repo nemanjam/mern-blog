@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
 import {
   SET_ERROR,
@@ -25,10 +24,9 @@ export const loadMe = () => async (dispatch, getState) => {
     const options = attachTokenToHeaders(getState);
     const response = await axios.get('/api/me', options);
 
-    console.log(response);
     dispatch({
       type: ME_SUCCESS,
-      payload: { token: response.data },
+      payload: { me: response.data.me },
     });
   } catch (err) {
     dispatch({
@@ -87,7 +85,7 @@ export const loginUserWithEmail = (formData, cb, cbErr) => async (dispatch, getS
   }
 };
 
-export const logInUserWithOuth = token => async (dispatch, getState) => {
+export const logInUserWithOauth = token => async (dispatch, getState) => {
   dispatch({ type: LOGIN_WITH_OAUTH_LOADING });
 
   try {

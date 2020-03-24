@@ -1,43 +1,48 @@
-import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
+import React, { useEffect } from 'react';
+import { Route, Switch } from 'react-router-dom';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import Cookies from 'js-cookie';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Profile from './pages/private/Profile';
 import Feature from './pages/private/Feature';
-import rootReducer from './store/reducers';
 
-const initialState = {};
+import { logInUserWithOauth, loadMe } from './store/actions/authActions';
 
-const store = createStore(
-  rootReducer,
-  initialState,
-  compose(
-    applyMiddleware(thunk),
-    (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ &&
-      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__()) ||
-      compose,
-  ),
-);
+const App = ({ logInUserWithOauth, auth, loadMe }) => {
+  useEffect(() => {
+    if (window.location.hash === '#_=_') window.location.hash = '';
 
-const App = () => {
+    const cookieJwt = Cookies.get('x-auth-cookie');
+    if (cookieJwt) {
+      Cookies.remove('x-auth-cookie');
+      logInUserWithOauth(cookieJwt);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (auth.token && !auth.isAuthenticated) {
+      loadMe();
+    }
+  }, [auth.isAuthenticated, auth.token, loadMe]);
+
   return (
-    <Provider store={store}>
-      <Router>
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Register} />
-          <Route path="/profile" component={Profile} />
-          <Route path="/feature" component={Feature} />
-        </Switch>
-      </Router>
-    </Provider>
+    <Switch>
+      <Route exact path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/feature" component={Feature} />
+    </Switch>
   );
 };
 
-export default App;
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors,
+});
+
+export default compose(connect(mapStateToProps, { logInUserWithOauth, loadMe }))(App);

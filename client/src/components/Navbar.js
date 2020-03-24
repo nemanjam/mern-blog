@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import PropTypes from 'prop-types';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,7 +15,7 @@ import ExitToApp from '@material-ui/icons/ExitToApp';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 
-import { logInUserWithOuth, logOutUser, loadMe } from '../store/actions/authActions';
+import { logOutUser, loadMe } from '../store/actions/authActions';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,18 +29,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Navbar = ({ auth, logOutUser, logInUserWithOuth, loadMe, history }) => {
+const Navbar = ({ auth, logOutUser, loadMe, history }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-
-  useEffect(() => {
-    if (window.location.hash === '#_=_') window.location.hash = '';
-
-    const cookieJwt = Cookies.get('x-auth-cookie');
-    if (cookieJwt) {
-      Cookies.remove('x-auth-cookie');
-      logInUserWithOuth(cookieJwt);
-    }
-  }, []);
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -134,7 +123,4 @@ const mapStateToProps = state => ({
   errors: state.errors,
 });
 
-export default compose(
-  withRouter,
-  connect(mapStateToProps, { logInUserWithOuth, logOutUser, loadMe }),
-)(Navbar);
+export default compose(withRouter, connect(mapStateToProps, { logOutUser, loadMe }))(Navbar);
