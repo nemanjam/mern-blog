@@ -31,11 +31,11 @@ const App = ({ logInUserWithOauth, auth, loadMe }) => {
 
   return (
     <Switch>
-      <Route exact path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/profile" component={Profile} />
       <Route path="/feature" component={Feature} />
+      <Route exact path="/" component={Home} />
     </Switch>
   );
 };
